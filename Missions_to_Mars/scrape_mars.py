@@ -6,14 +6,17 @@ import os
 import time
 
 # News title & paragraph scraping
-def mars_news(browser):
+def mars_news():
+
+    executable_path = {"executable_path": "C:\\Users\\home\\Downloads\\tmp\\chromedriver.exe"}
+    browser = Browser("chrome", **executable_path, headless=False)
 
     # visiting Mars News site
     url = "https://mars.nasa.gov/news/"
     browser.visit(url)
 
     # waiting for Splinter to load the content of the site
-    time.sleep(5)
+    time.sleep(3)
 
     html = browser.html
     soup = bs(html, "html.parser")
@@ -30,11 +33,18 @@ def mars_news(browser):
     except AttributeError:
         return None, None
 
+    # closing browser after scraping
+    browser.quit()
+
     # returning variables news_title and news_paragraph
     return news_title, news_paragraph
 
 # featured image scraping
-def featured_img(browser):
+def featured_img():
+
+    executable_path = {"executable_path": "C:\\Users\\home\\Downloads\\tmp\\chromedriver.exe"}
+    browser = Browser("chrome", **executable_path, headless=False)
+
 
     # visiting jpl site
     url = "https://www.jpl.nasa.gov/spaceimages/?search=&category=Mars"
@@ -43,7 +53,7 @@ def featured_img(browser):
     time.sleep(1)
 
     # using Splinter to go to site and click Button with class name full_image
-    # <footer a class="button fancybox">FULL IMAGE</footer>
+    # <footer> <a id="full_image" class="button fancybox">FULL IMAGE</footer>
     full_image_button = browser.find_by_id("full_image")
     full_image_button.click()
 
@@ -66,6 +76,9 @@ def featured_img(browser):
     # combine with the base url
     img_url = f"https://www.jpl.nasa.gov{img_url}"
 
+    # closing browser after scraping
+    browser.quit()
+
     return img_url
 
 # Mars facts scraping
@@ -83,7 +96,11 @@ def mars_facts():
     return facts_df.to_html(index=False)
 
 # Hemisphere scraping
-def hemisphere(browser):
+def hemisphere():
+
+    executable_path = {"executable_path": "C:\\Users\\home\\Downloads\\tmp\\chromedriver.exe"}
+    browser = Browser("chrome", **executable_path, headless=False)
+
     # visiting the site
     url = "https://astrogeology.usgs.gov/search/results?q=hemisphere+enhanced&k1=target&v1=Mars"
     browser.visit(url)
@@ -113,26 +130,26 @@ def hemisphere(browser):
         # going backward to the previous page
         browser.back()
 
+    # closing browser after scraping
+    browser.quit()
+
     # returning results
     return hemi_img_urls
 
 # main web scraping
 def scrape_data():
 
-    executable_path = {"executable_path": "C:\\Users\\home\\Downloads\\tmp\\chromedriver.exe"}
-    browser = Browser("chrome", **executable_path, headless=False)
-
     # calling function to display latest news title and its paragraph
-    news_title, news_paragraph = mars_news(browser)
+    news_title, news_paragraph = mars_news()
 
     # calling function to scrape featured image
-    img_url = featured_img(browser)
+    img_url = featured_img()
 
     # calling mars_facts function
     facts = mars_facts()
 
     # calling hemisphere function
-    hemisphere_image_urls = hemisphere(browser)
+    hemisphere_image_urls = hemisphere()
 
     data = {
         "news_title": news_title,
@@ -141,9 +158,6 @@ def scrape_data():
         "facts": facts,
         "hemispheres": hemisphere_image_urls,
     }
-
-    # closing browser after scraping
-    browser.quit()
 
     # returning results
     return data
